@@ -21,8 +21,7 @@ pub async fn handle(
             info!("Logged in as {}", data_about_bot.user.name);
         }
         FullEvent::Message { new_message } => {
-            if anti_spam::message(ctx, new_message).await?
-                || compile::message(ctx, new_message).await?
+            if compile::message(ctx, new_message).await?
                 || new_members_mention::message(ctx, new_message).await?
                 || read_github_links::message(ctx, new_message).await
             {
@@ -33,12 +32,11 @@ pub async fn handle(
         FullEvent::GuildMemberAddition { new_member } => {
             join::guild_member_addition(ctx, &GuildId::new(data.secrets.guild_id), new_member)
                 .await;
-        },
+        }
         FullEvent::InteractionCreate { interaction } => {
             // for buttons
-            if let Some (interaction) = interaction.as_message_component() {
-                if
-                    read_github_links::handle_delete_embed(ctx, interaction).await
+            if let Some(interaction) = interaction.as_message_component() {
+                if read_github_links::handle_delete_embed(ctx, interaction).await
                     || read_github_links::handle_save_embed(ctx, interaction).await
                 {
                     return Ok(());
